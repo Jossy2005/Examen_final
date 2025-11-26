@@ -1,6 +1,6 @@
 Proyecto: Mini IA Flask - examen CI/CD
 Rama obligatoria: bastidas
-Imagen a publicar: ghcr.io/<OWNER>/bastidas:1.0.5
+
 
 Instrucciones:
 - Crear rama 'bastidas'
