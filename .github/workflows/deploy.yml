@@ -67,7 +67,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📤 Copy stack.yml to VPS
+      - name: 📥 Checkout code (para traer stack.yml)
+        uses: actions/checkout@v4
+
+      - name: 📂 Verificar archivos antes del SCP
+        run: |
+          echo "📁 Contenido del workspace:"
+          ls -R .
+
+      - name: 📤 Copiar stack.yml al VPS
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
