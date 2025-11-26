@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return jsonify({"message": "API funcionando correctamente"}), 200
+    return jsonify({"message": "La API funciona"}), 200
 
 # Endpoint "IA" (simple, como el del zip)
 @app.route("/predict", methods=["POST"])
