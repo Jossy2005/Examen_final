@@ -1,6 +1,6 @@
 import pytest
 import json
-from main import app  # <- cambió el nombre aquí
+from app import app 
 
 @pytest.fixture
 def client():
