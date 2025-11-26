@@ -1,25 +1,28 @@
 import json
-from app import app as flask_app
-import pytest
+from app import app
 
-@pytest.fixture
-def client():
-    flask_app.testing = True
-    return flask_app.test_client()
+def test_home():
+    tester = app.test_client()
+    response = tester.get("/")
+    assert response.status_code == 200
+    assert b"API funcionando" in response.data
 
-def test_index(client):
-    r = client.get("/")
-    assert r.status_code == 200
+def test_predict_ok():
+    tester = app.test_client()
+    response = tester.post(
+        "/predict",
+        data=json.dumps({"text": "hola"}),
+        content_type="application/json"
+    )
+    assert response.status_code == 200
+    json_data = json.loads(response.data)
+    assert "IA procesó tu texto" in json_data["result"]
 
-def test_ia_empty(client):
-    r = client.post("/ia", json={})
-    assert r.status_code == 200
-    data = r.get_json()
-    # Si el endpoint recibe JSON vacío -> pregunta será None o '' -> respuesta indica que escriba pregunta
-    assert "Escribe" in data.get("respuesta", "") or data.get("pregunta") is None
-
-def test_ia_simple(client):
-    r = client.post("/ia", data={"pregunta": "hola mundo"})
-    assert r.status_code == 200
-    data = r.get_json()
-    assert "hola" in data.get("respuesta") or "Respuesta" in data.get("respuesta")
+def test_predict_error():
+    tester = app.test_client()
+    response = tester.post(
+        "/predict",
+        data=json.dumps({}),   # falta "text"
+        content_type="application/json"
+    )
+    assert response.status_code == 400

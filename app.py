@@ -1,27 +1,26 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-def generar_respuesta(pregunta: str) -> str:
-    if not pregunta or pregunta.strip() == "":
-        return "Escribe una pregunta."
-    # Respuesta IA muy simple (simulada)
-    if "?" in pregunta:
-        return "Respuesta (simulada): depende del contexto, por favor describe más detalles."
-    words = pregunta.strip().split()
-    if len(words) <= 8:
-        return "Respuesta (simulada): " + " ".join(reversed(words))
-    return "Resumen (simulado): " + " ".join(words[:12]) + "..."
-
 @app.route("/")
-def index():
-    return render_template("index.html")
+def home():
+    return jsonify({"message": "API funcionando correctamente"}), 200
 
-@app.route("/ia", methods=["POST"])
-def ia():
-    pregunta = request.form.get("pregunta") or request.json.get("pregunta") if request.is_json else None
-    respuesta = generar_respuesta(pregunta)
-    return jsonify({"pregunta": pregunta, "respuesta": respuesta})
+# Endpoint "IA" (simple, como el del zip)
+@app.route("/predict", methods=["POST"])
+def predict():
+    data = request.get_json()
+
+    if not data or "text" not in data:
+        return jsonify({"error": "Debe enviar el campo 'text'"}), 400
+
+    text = data["text"]
+
+    # IA mínima (similar al ZIP)
+    respuesta = f"IA procesó tu texto: {text}"
+
+    return jsonify({"result": respuesta}), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
