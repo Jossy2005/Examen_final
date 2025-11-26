@@ -10,7 +10,7 @@ def client():
 def test_home(client):
     response = client.get("/")
     data = json.loads(response.get_data(as_text=True))
-    assert data["message"] == "La API funciona"
+    assert data["message"] == "La API funciona correctamente"
 
 def test_predict_ok(client):
     response = client.post("/predict", json={"text": "Hola"})
