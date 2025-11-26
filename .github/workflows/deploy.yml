@@ -16,7 +16,7 @@ env:
 
 jobs:
   test:
-    name: 🧪 Tests
+    name: 🧪 Run Tests
     runs-on: ubuntu-latest
     
     steps:
