@@ -1,26 +1,24 @@
-from flask import Flask, request, jsonify
+import pytest
+import json
+from app import app
 
-app = Flask(__name__)
+@pytest.fixture
+def client():
+    with app.test_client() as client:
+        yield client
 
-@app.route("/")
-def home():
-    return jsonify({"message": "La API funciona"}), 200
+def test_home(client):
+    response = client.get("/")
+    data = json.loads(response.get_data(as_text=True))
+    assert data["message"] == "La API funciona"
 
-# Endpoint "IA" (simple, como el del zip)
-@app.route("/predict", methods=["POST"])
-def predict():
-    data = request.get_json()
+def test_predict_ok(client):
+    response = client.post("/predict", json={"text": "Hola"})
+    data = json.loads(response.get_data(as_text=True))
+    assert data["result"] == "IA procesó tu texto: Hola"
 
-    if not data or "text" not in data:
-        return jsonify({"error": "Debe enviar el campo 'text'"}), 400
-
-    text = data["text"]
-
-    # IA mínima (similar al ZIP)
-    respuesta = f"IA procesó tu texto: {text}"
-
-    return jsonify({"result": respuesta}), 200
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+def test_predict_error(client):
+    response = client.post("/predict", json={})
+    data = json.loads(response.get_data(as_text=True))
+    assert response.status_code == 400
+    assert "error" in data

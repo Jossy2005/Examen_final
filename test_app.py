@@ -1,28 +1,24 @@
+import pytest
 import json
 from app import app
 
-def test_home():
-    tester = app.test_client()
-    response = tester.get("/")
-    assert response.status_code == 200
-    assert b"API funcionando" in response.data
+@pytest.fixture
+def client():
+    with app.test_client() as client:
+        yield client
 
-def test_predict_ok():
-    tester = app.test_client()
-    response = tester.post(
-        "/predict",
-        data=json.dumps({"text": "hola"}),
-        content_type="application/json"
-    )
-    assert response.status_code == 200
-    json_data = json.loads(response.data)
-    assert "IA procesó tu texto" in json_data["result"]
+def test_home(client):
+    response = client.get("/")
+    data = json.loads(response.get_data(as_text=True))
+    assert data["message"] == "La API funciona"
 
-def test_predict_error():
-    tester = app.test_client()
-    response = tester.post(
-        "/predict",
-        data=json.dumps({}),   # falta "text"
-        content_type="application/json"
-    )
+def test_predict_ok(client):
+    response = client.post("/predict", json={"text": "Hola"})
+    data = json.loads(response.get_data(as_text=True))
+    assert data["result"] == "IA procesó tu texto: Hola"
+
+def test_predict_error(client):
+    response = client.post("/predict", json={})
+    data = json.loads(response.get_data(as_text=True))
     assert response.status_code == 400
+    assert "error" in data
